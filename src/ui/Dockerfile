@@ -5,7 +5,7 @@ ENV APP_HOME /app
 WORKDIR $APP_HOME
 ADD Gemfile* $APP_HOME
 RUN bundle update --bundler && bundle install
-ADD . $APP_HOME
+ADD . $APP_HOME/
 
 ENV POST_SERVICE_HOST post
 ENV POST_SERVICE_PORT 5000
