@@ -1,0 +1,4 @@
+REPOSITORY               TAG       IMAGE ID       CREATED         SIZE
+st0rik/ubuntu-tmp-file   latest    e58204585609   2 minutes ago   63.2MB
+ubuntu                   18.04     f9a80a55f492   9 months ago    63.2MB
+hello-world              latest    d2c94e258dcb   10 months ago   13.3kB
