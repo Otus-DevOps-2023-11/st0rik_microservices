@@ -3,7 +3,6 @@ RUN apt-get update -qq && apt-get install -y build-essential
 
 ENV APP_HOME /app
 WORKDIR $APP_HOME
-ADD Gemfile* $APP_HOME
 RUN bundle update --bundler && bundle install
 ADD . $APP_HOME/
 
