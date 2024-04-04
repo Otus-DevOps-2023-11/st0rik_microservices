@@ -10,7 +10,7 @@ services:
       - back_net
 
   fluentd:
-    image: seeker00837149/fluentd  
+    image: st0rik/fluentd  
     ports:
       - "24224:24224"
       - "24224:24224/udp"
