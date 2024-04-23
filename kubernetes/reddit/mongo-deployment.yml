@@ -1,18 +1,33 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mongo-deployment
+  name: mongo
+  labels:
+    app: reddit
+    component: mongo
+    comment-db: "true"
+    post-db: "true"
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: mongo
+      app: reddit
+      component: mongo
   template:
     metadata:
       name: mongo
       labels:
-        app: mongo
+        app: reddit
+        component: mongo
     spec:
       containers:
-      - image: chromko/mongodb
+      - image: mongo:3.2
         name: mongo
+        volumeMounts:
+        - name: phenex-mongo
+          mountPath: /data/db
+      volumes:
+      - name: phenex-mongo
+        persistentVolumeClaim:
+          claimName: phenex-mongo
