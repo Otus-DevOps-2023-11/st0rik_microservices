@@ -25,7 +25,7 @@ spec:
       - image: mongo:3.2
         name: mongo
         volumeMounts:
-        - name: phenex-mongo
+        - name: mongo-persistent-storage
           mountPath: /data/db
       volumes:
       - name: phenex-mongo
