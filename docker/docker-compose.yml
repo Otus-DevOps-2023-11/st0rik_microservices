@@ -1,88 +1,53 @@
 version: '3.3'
 services:
+
   post_db:
     image: mongo:${MONGO_TAG}
     volumes:
       - post_db:/data/db
     networks:
-      back_net:
-        aliases:
-          - post_db
-  comment_db:
-    image: mongo:${MONGO_TAG}
-    volumes:
-      - comment_db:/data/db
-    networks:
-      back_net:
-        aliases:
-          - comment_db
+    - back_net
+    environment:
+      - ZIPKIN_ENABLED=${ZIPKIN_ENABLED}
+
   ui:
-    build: ./ui
     image: ${USERNAME_HUB}/ui:${SERVICE_VER}
     ports:
-      - 8080:9292/tcp
+      - ${EXT_PORT}:${INT_PORT}/tcp
     networks:
-      front_net:
-        aliases:
-          - ui
+    - front_net
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: localhost:24224
+        tag: service.ui
+    environment:
+      - ZIPKIN_ENABLED=${ZIPKIN_ENABLED}
+
   post:
-    build: ./post-py
     image: ${USERNAME_HUB}/post:${SERVICE_VER}
-    container_name: post
     networks:
-      front_net:
-        aliases:
-          - post
-      back_net:
-        aliases:
-          - post
+    - back_net
+    - front_net
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: localhost:24224
+        tag: service.post
+    environment:
+      - ZIPKIN_ENABLED=${ZIPKIN_ENABLED}
+
   comment:
-    build: ./comment
     image: ${USERNAME_HUB}/comment:${SERVICE_VER}
     networks:
-      front_net:
-        aliases:
-          - comment
-      back_net:
-        aliases:
-          - comment
-  prometheus:
-    image: ${USERNAME_HUB}/prometheus
-    ports:
-      - '9090:9090'
-    volumes:
-      - prometheus_data:/prometheus
-    command: # Передаем доп параметры в командной строке
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--storage.tsdb.retention=1d' # Задаем время хранения метрик в 1 день
-    networks:
-      mon_net:
-        aliases:
-          - mon
-      front_net:
-        aliases:
-          - mon
-      back_net:
-        aliases:
-          - mon
-
-  node-exporter:
-    image: prom/node-exporter:v0.15.2
-    user: root
-    volumes:
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /:/rootfs:ro
-    command:
-      - '--path.procfs=/host/proc'
-      - '--path.sysfs=/host/sys'
-      - '--collector.filesystem.ignored-mount-points="^/(sys|proc|dev|host|etc)($$|/)"'
+    - back_net
+    - front_net
+    environment:
+      - ZIPKIN_ENABLED=${ZIPKIN_ENABLED}
 
 volumes:
   post_db:
-  comment_db:
-  prometheus_data:
+  comment_db:    
 
 networks:
   front_net:
@@ -95,9 +60,3 @@ networks:
     ipam:
       config:
         - subnet: ${BACK_NET_SUBNET}
-  mon_net:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: ${MON_NET_SUBNET}
-
